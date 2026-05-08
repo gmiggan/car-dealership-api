@@ -1,53 +1,91 @@
 ---
-title: Car Dealership API
-description: A comprehensive REST API for managing car dealerships, vehicle inventory, and service records.
+title: "Car Dealership API"
+description: "A comprehensive REST API for managing car dealerships, vehicle inventory, and service records."
 ---
 
-# Car Dealership API
+## Setting up
 
-Build and manage car dealership operations with a full-featured REST API covering inventory management, sales workflows, service tracking, and cross-dealership operations.
+Get your documentation site up and running in minutes.
 
-<CardGroup cols={2}>
-  <Card title="Quickstart" icon="rocket" href="/quickstart">
-    Get the API running locally in under a minute.
+<Card title="Start here" icon="rocket" horizontal href="/quickstart">
+  Follow our three step quickstart guide.
+</Card>
+
+## Make it yours
+
+Design a docs site that looks great and empowers your users.
+
+<Columns cols={2}>
+  <Card title="Edit locally" icon="pen-to-square" href="/development">
+    Edit your docs locally and preview them in real time.
   </Card>
-  <Card title="Authentication" icon="lock" href="/authentication">
-    Learn how API key authentication works.
+
+  <Card title="Customize your site" icon="palette" href="/essentials/settings">
+    Customize the design and colors of your site to match your brand.
   </Card>
-  <Card title="API Reference" icon="code" href="/api-reference">
-    Explore all 28 endpoints with interactive examples.
+
+  <Card title="Set up navigation" icon="map" href="/essentials/navigation">
+    Organize your docs to help users find what they need and succeed with your product.
   </Card>
-  <Card title="Concepts" icon="book" href="/concepts/dealerships">
-    Understand the data model and workflows.
+
+  <Card title="API documentation" icon="terminal" href="/api-reference/introduction">
+    Auto-generate API documentation from OpenAPI specifications.
   </Card>
-</CardGroup>
+</Columns>
 
-## Overview
+## Create beautiful pages
 
-The API is organized around three core resources:
+Everything you need to create world-class documentation.
 
-| Resource | Description |
-| --- | --- |
-| **Dealerships** | Physical locations that hold car inventory. Each dealership tracks its own stats. |
-| **Cars** | Vehicles belonging to a dealership. Cars move through a status workflow: available → reserved → sold. |
-| **Service Records** | Maintenance history for individual cars. Nested under both dealerships and cars. |
+<Columns cols={2}>
+  <Card title="Write with MDX" icon="pen-fancy" href="/essentials/markdown">
+    Use MDX to style your docs pages.
+  </Card>
 
-## Key Features
+  <Card title="Code samples" icon="code" href="/essentials/code">
+    Add sample code to demonstrate how to use your product.
+  </Card>
 
-<AccordionGroup>
-  <Accordion title="Pagination & Sorting">
-    All list endpoints return paginated responses with `total`, `has_more`, `limit`, and `offset` metadata. Car listings support sorting by price, year, mileage, or creation date.
-  </Accordion>
-  <Accordion title="Bulk Operations">
-    Add up to 50 cars in a single request. The response includes both `created` and `failed` arrays with per-item error reporting.
-  </Accordion>
-  <Accordion title="Status Workflow">
-    Cars follow a state machine: `available` → `reserved` → `sold`, with an `in_service` state during maintenance. Guard clauses prevent invalid transitions.
-  </Accordion>
-  <Accordion title="Cross-Dealership Transfer">
-    Move cars between dealerships while preserving their full service history.
-  </Accordion>
-  <Accordion title="Global Search">
-    Search across dealerships and cars simultaneously with type filtering and relevance scoring.
-  </Accordion>
-</AccordionGroup>
+  <Card title="Images" icon="image" href="/essentials/images">
+    Display images and other media.
+  </Card>
+
+  <Card title="Reusable snippets" icon="recycle" href="/essentials/reusable-snippets">
+    Write once and reuse across your docs.
+  </Card>
+</Columns>
+
+## Make your content agent ready
+
+Make your docs work for humans and AI agents alike.
+
+<Columns cols={2}>
+  <Card title="Prompt component" icon="robot" href="/agent-ready/prompt">
+    Embed shareable AI prompts readers can copy or open in Cursor.
+  </Card>
+
+  <Card title="Visibility" icon="eye" href="/agent-ready/visibility">
+    Show different content to humans and agents reading your docs.
+  </Card>
+
+  <Card title="Contextual menu" icon="bolt" href="/agent-ready/contextual">
+    Give readers one-click access to Claude, ChatGPT, Cursor, and more.
+  </Card>
+
+  <Card title="AI coding tools" icon="wand-magic-sparkles" href="/ai-tools/claude-code">
+    Set up Claude Code, Cursor, or Windsurf with Mintlify's skill.
+  </Card>
+</Columns>
+
+## Need inspiration?
+
+<Card title="See complete examples" icon="stars" href="https://mintlify.com/customers">
+  Browse our showcase of exceptional documentation sites.
+</Card>
+
+<RequestExample>
+
+```text filename
+```
+
+</RequestExample>

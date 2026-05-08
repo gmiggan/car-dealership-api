@@ -1,6 +1,6 @@
 ---
-title: Authentication
-description: How API key authentication works in the Car Dealership API.
+title: "Authentication"
+description: "How API key authentication works in the Car Dealership API."
 ---
 
 # Authentication
@@ -17,7 +17,7 @@ The API uses a static API key passed via the `x-api-key` HTTP header.
 | Bulk operations | Compare |
 | Complete service | Dealership stats |
 
-## Sending the key
+## Sending the key steh sdgh sethseth set h
 
 Include the `x-api-key` header in your request:
 
@@ -32,7 +32,7 @@ curl -X POST http://localhost:8111/dealerships \
 
 The default development key is:
 
-```
+```text
 demo-key-12345
 ```
 
@@ -48,6 +48,7 @@ uvicorn main:app --reload --port 8111
 ## Error responses
 
 <ResponseExample>
+
 ```json Missing header (422)
 {
   "detail": [
@@ -66,6 +67,7 @@ uvicorn main:app --reload --port 8111
   "detail": "Invalid API key"
 }
 ```
+
 </ResponseExample>
 
 <Warning>
