@@ -1,0 +1,65 @@
+---
+title: Dealerships
+description: Understanding the Dealership resource — the top-level entity in the API.
+---
+
+# Dealerships
+
+A **Dealership** represents a physical car dealership location. It is the top-level resource in the API — all cars and service records belong to a dealership.
+
+## Data Model
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `id` | integer | Auto | Unique identifier |
+| `name` | string | Yes | Dealership name (must be unique) |
+| `address` | string | Yes | Physical address |
+| `phone` | string | Yes | Contact phone number |
+| `email` | string | No | Contact email |
+| `website` | string | No | Website URL |
+| `rating` | float | No | Rating from 0.0 to 5.0 (default: 0.0) |
+| `is_active` | boolean | No | Whether the dealership is active (default: true) |
+| `created_at` | datetime | Auto | Creation timestamp |
+| `updated_at` | datetime | Auto | Last update timestamp |
+
+## Relationships
+
+```
+Dealership (1)
+    └──< Car (many)
+           └──< ServiceRecord (many)
+```
+
+Deleting a dealership cascades to all its cars and their service records. This is a hard delete — there is no soft-delete or archival mechanism.
+
+## Uniqueness
+
+Dealership names must be unique. Attempting to create a dealership with a name that already exists returns a `409 Conflict` response.
+
+## Statistics
+
+Each dealership has a computed stats endpoint (`GET /dealerships/{id}/stats`) that aggregates data across all its cars:
+
+| Stat | Description |
+| --- | --- |
+| `total_inventory_value` | Sum of prices for all available (unsold) cars |
+| `total_sales_revenue` | Sum of prices for all sold cars |
+| `average_car_price` | Mean price across all cars |
+| `average_days_to_sell` | Mean time between listing and sale |
+| `most_common_make` | The make that appears most often in inventory |
+| `service_records_count` | Total service records across all cars |
+| `total_service_revenue` | Sum of all service record costs |
+
+These stats are computed on every request — they are not cached or materialized.
+
+## Pagination and Filtering
+
+The list endpoint (`GET /dealerships`) supports:
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `limit` | integer (1–100) | Max items to return (default: 20) |
+| `offset` | integer | Number of items to skip (default: 0) |
+| `is_active` | boolean | Filter by active/inactive status |
+| `min_rating` | float (0–5) | Minimum rating threshold |
+| `name` | string | Partial name match (case-insensitive) |

@@ -1,0 +1,86 @@
+---
+title: Quickstart
+description: Get the Car Dealership API running locally in under a minute.
+---
+
+# Quickstart
+
+## Prerequisites
+
+- Python 3.11+
+- pip
+
+## Setup
+
+<Steps>
+  <Step title="Clone the repository">
+    ```bash
+    git clone https://github.com/gmiggan/car-dealership-api.git
+    cd car-dealership-api
+    ```
+  </Step>
+  <Step title="Create a virtual environment">
+    ```bash
+    python3 -m venv .venv
+    source .venv/bin/activate
+    ```
+  </Step>
+  <Step title="Install dependencies">
+    ```bash
+    pip install -r requirements.txt
+    ```
+  </Step>
+  <Step title="Start the server">
+    ```bash
+    uvicorn main:app --reload --port 8111
+    ```
+    The API is now running at `http://localhost:8111`. The interactive Swagger UI is at `http://localhost:8111/docs`.
+  </Step>
+</Steps>
+
+## Try It Out
+
+### Create your first dealership
+
+```bash
+curl -X POST http://localhost:8111/dealerships \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: demo-key-12345" \
+  -d '{
+    "name": "My Dealership",
+    "address": "123 Main St",
+    "phone": "555-0100"
+  }'
+```
+
+### Add a car
+
+```bash
+curl -X POST http://localhost:8111/dealerships/1/cars \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: demo-key-12345" \
+  -d '{
+    "make": "BMW",
+    "model": "M3",
+    "year": 2024,
+    "price": 75000,
+    "color": "Alpine White"
+  }'
+```
+
+### Sell it
+
+```bash
+curl -X POST http://localhost:8111/cars/1/sell \
+  -H "x-api-key: demo-key-12345"
+```
+
+### Check the stats
+
+```bash
+curl http://localhost:8111/dealerships/1/stats
+```
+
+<Note>
+  The default API key is `demo-key-12345`. Read-only endpoints (listings, search, health) don't require authentication.
+</Note>

@@ -1,0 +1,73 @@
+---
+title: Authentication
+description: How API key authentication works in the Car Dealership API.
+---
+
+# Authentication
+
+The API uses a static API key passed via the `x-api-key` HTTP header.
+
+## Which endpoints require auth?
+
+| Requires API Key | Public (no auth) |
+| --- | --- |
+| Create / Update / Delete (all resources) | List / Get (all resources) |
+| Sell / Reserve / Unreserve / Transfer | Search |
+| Photo upload | Health check |
+| Bulk operations | Compare |
+| Complete service | Dealership stats |
+
+## Sending the key
+
+Include the `x-api-key` header in your request:
+
+```bash
+curl -X POST http://localhost:8111/dealerships \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: demo-key-12345" \
+  -d '{"name": "Test", "address": "123 St", "phone": "555-0100"}'
+```
+
+## Default key
+
+The default development key is:
+
+```
+demo-key-12345
+```
+
+## Custom key
+
+Override the default by setting the `DEALERSHIP_API_KEY` environment variable before starting the server:
+
+```bash
+export DEALERSHIP_API_KEY="my-secret-key-here"
+uvicorn main:app --reload --port 8111
+```
+
+## Error responses
+
+<ResponseExample>
+```json Missing header (422)
+{
+  "detail": [
+    {
+      "type": "missing",
+      "loc": ["header", "x-api-key"],
+      "msg": "Field required",
+      "input": null
+    }
+  ]
+}
+```
+
+```json Invalid key (401)
+{
+  "detail": "Invalid API key"
+}
+```
+</ResponseExample>
+
+<Warning>
+  This is a demo authentication system using a single static key. It is not suitable for production use. A real API would use OAuth 2.0, JWT tokens, or scoped API keys with rate limiting.
+</Warning>

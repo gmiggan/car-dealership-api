@@ -1,0 +1,147 @@
+---
+title: Cars
+description: Understanding the Car resource — inventory management, status workflow, and operations.
+---
+
+# Cars
+
+A **Car** represents a vehicle in a dealership's inventory. Cars are the central resource in the API, with the richest set of operations including bulk import, status transitions, transfers, photo upload, and comparison.
+
+## Data Model
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `id` | integer | Auto | Unique identifier |
+| `dealership_id` | integer | Auto | ID of the owning dealership |
+| `make` | string | Yes | Manufacturer (e.g., "BMW", "Toyota") |
+| `model` | string | Yes | Model name (e.g., "M3", "Supra") |
+| `year` | integer | Yes | Model year (1900–2030) |
+| `price` | float | Yes | Listing price (must be > 0) |
+| `color` | string | Yes | Exterior color |
+| `mileage` | integer | No | Odometer reading (default: 0) |
+| `vin` | string | No | 17-character Vehicle Identification Number (unique) |
+| `status` | enum | No | Current status (default: `available`) |
+| `description` | string | No | Free-text description (max 2000 chars) |
+| `photo_url` | string | Auto | Path to uploaded photo |
+| `is_sold` | boolean | Auto | Whether the car has been sold |
+| `created_at` | datetime | Auto | Listing timestamp |
+| `updated_at` | datetime | Auto | Last update timestamp |
+| `sold_at` | datetime | Auto | Sale timestamp (null until sold) |
+
+## Status Workflow
+
+Cars move through four statuses with explicit transition endpoints:
+
+```
+                    ┌─────────────┐
+           ┌───────│  available  │◄──────┐
+           │       └──────┬──────┘       │
+           │              │              │
+      POST /reserve  POST /sell   POST /services/{id}/complete
+           │              │        (when last open service completes)
+           ▼              ▼              │
+    ┌────────────┐  ┌──────────┐  ┌──────┴───────┐
+    │  reserved  │  │   sold   │  │  in_service  │
+    └─────┬──────┘  └──────────┘  └──────────────┘
+          │                              ▲
+    POST /unreserve           POST /dealerships/{id}/cars/{id}/services
+          │                     (creating a service record)
+          ▼
+    ┌────────────┐
+    │  available │
+    └────────────┘
+```
+
+### Transition Rules
+
+| From | To | Endpoint | Notes |
+| --- | --- | --- | --- |
+| `available` | `reserved` | `POST /cars/{id}/reserve` | — |
+| `reserved` | `available` | `POST /cars/{id}/unreserve` | — |
+| `available` | `sold` | `POST /cars/{id}/sell` | Sets `sold_at` timestamp |
+| `available` | `in_service` | `POST /dealerships/{id}/cars/{id}/services` | Automatic when service created |
+| `in_service` | `available` | `POST /services/{id}/complete` | Only when last open service is completed |
+| `reserved` | `sold` | — | **Blocked.** Must unreserve first. |
+| `in_service` | `sold` | — | **Blocked.** Must complete services first. |
+| `sold` | any | — | **Terminal state.** No transitions out. |
+
+## Bulk Import
+
+The `POST /dealerships/{id}/cars/bulk` endpoint accepts up to 50 cars in a single request. Each car is validated independently — if one fails (e.g., duplicate VIN), the others still get created.
+
+The response includes both arrays:
+
+```json
+{
+  "created": [ /* successfully created cars */ ],
+  "failed": [
+    {
+      "index": 2,
+      "error": "Duplicate VIN: WBA5A5C55FD123456",
+      "data": { /* the original input */ }
+    }
+  ],
+  "total_created": 3,
+  "total_failed": 1
+}
+```
+
+## Transfer
+
+Cars can be moved between dealerships via `POST /cars/{id}/transfer`. Restrictions:
+
+- Sold cars cannot be transferred
+- The target dealership must exist
+- Transferring to the same dealership returns a `400`
+- Service history is preserved (service records stay linked to the car)
+
+## Photo Upload
+
+Upload a car photo via `POST /cars/{id}/photo` using `multipart/form-data`:
+
+```bash
+curl -X POST http://localhost:8111/cars/1/photo \
+  -H "x-api-key: demo-key-12345" \
+  -F "file=@car-photo.jpg"
+```
+
+Accepted formats: JPEG, PNG, WebP. The photo is saved to the `uploads/` directory and the `photo_url` field is updated.
+
+## Comparison
+
+Compare 2–5 cars side by side via `POST /cars/compare`:
+
+```json
+{
+  "car_ids": [1, 3, 5]
+}
+```
+
+The response includes the full car objects plus computed ranges:
+
+```json
+{
+  "cars": [ /* full car objects */ ],
+  "price_range": { "min": 45000, "max": 82000, "spread": 37000 },
+  "mileage_range": { "min": 500, "max": 22000, "spread": 21500 },
+  "year_range": { "min": 2022, "max": 2024, "spread": 2 }
+}
+```
+
+## Filtering and Sorting
+
+The list endpoint (`GET /dealerships/{id}/cars`) supports extensive filtering:
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `status` | enum | Filter by car status |
+| `is_sold` | boolean | Filter by sold state |
+| `make` | string | Partial match on manufacturer |
+| `color` | string | Partial match on color |
+| `min_price` / `max_price` | float | Price range |
+| `min_year` / `max_year` | integer | Model year range |
+| `max_mileage` | integer | Maximum odometer reading |
+| `sort_by` | enum | `price`, `year`, `mileage`, `created_at`, `make` |
+| `sort_order` | enum | `asc` or `desc` |
+| `limit` | integer (1–100) | Page size (default: 20) |
+| `offset` | integer | Pagination offset |

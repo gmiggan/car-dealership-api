@@ -1,0 +1,3151 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Car Dealership API",
+    "description": "A comprehensive API for managing car dealerships, inventory, and service records.",
+    "contact": {
+      "name": "API Support",
+      "email": "api@cardealership.example"
+    },
+    "license": {
+      "name": "MIT"
+    },
+    "version": "2.0.0"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Health Check",
+        "operationId": "health_check_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dealerships": {
+      "post": {
+        "tags": [
+          "Dealerships"
+        ],
+        "summary": "Create a new dealership",
+        "operationId": "create_dealership_dealerships_post",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "API key for authentication",
+              "title": "X-Api-Key"
+            },
+            "description": "API key for authentication"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DealershipCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DealershipResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Dealership with this name already exists"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Dealerships"
+        ],
+        "summary": "List dealerships with pagination and filters",
+        "operationId": "list_dealerships_dealerships_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Max items to return",
+              "default": 20,
+              "title": "Limit"
+            },
+            "description": "Max items to return"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Number of items to skip",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "Number of items to skip"
+          },
+          {
+            "name": "is_active",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by active status",
+              "title": "Is Active"
+            },
+            "description": "Filter by active status"
+          },
+          {
+            "name": "min_rating",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "maximum": 5,
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Minimum rating filter",
+              "title": "Min Rating"
+            },
+            "description": "Minimum rating filter"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Search by name (partial match)",
+              "title": "Name"
+            },
+            "description": "Search by name (partial match)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedResponse_DealershipResponse_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dealerships/{dealership_id}": {
+      "get": {
+        "tags": [
+          "Dealerships"
+        ],
+        "summary": "Get a dealership with its car inventory",
+        "operationId": "get_dealership_dealerships__dealership_id__get",
+        "parameters": [
+          {
+            "name": "dealership_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Dealership Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DealershipWithCars"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Dealership not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Dealerships"
+        ],
+        "summary": "Partially update a dealership",
+        "operationId": "update_dealership_dealerships__dealership_id__patch",
+        "parameters": [
+          {
+            "name": "dealership_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Dealership Id"
+            }
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "API key for authentication",
+              "title": "X-Api-Key"
+            },
+            "description": "API key for authentication"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DealershipUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DealershipResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Dealerships"
+        ],
+        "summary": "Delete Dealership",
+        "operationId": "delete_dealership_dealerships__dealership_id__delete",
+        "parameters": [
+          {
+            "name": "dealership_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Dealership Id"
+            }
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "API key for authentication",
+              "title": "X-Api-Key"
+            },
+            "description": "API key for authentication"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dealerships/{dealership_id}/stats": {
+      "get": {
+        "tags": [
+          "Dealerships"
+        ],
+        "summary": "Get aggregated statistics for a dealership",
+        "operationId": "get_dealership_stats_dealerships__dealership_id__stats_get",
+        "parameters": [
+          {
+            "name": "dealership_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Dealership Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DealershipStats"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dealerships/{dealership_id}/cars": {
+      "post": {
+        "tags": [
+          "Cars"
+        ],
+        "summary": "Add a car to a dealership",
+        "operationId": "add_car_dealerships__dealership_id__cars_post",
+        "parameters": [
+          {
+            "name": "dealership_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Dealership Id"
+            }
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "API key for authentication",
+              "title": "X-Api-Key"
+            },
+            "description": "API key for authentication"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CarCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CarResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Dealership not found"
+          },
+          "409": {
+            "description": "Car with this VIN already exists"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Cars"
+        ],
+        "summary": "List cars with sorting, filtering, and pagination",
+        "operationId": "list_cars_dealerships__dealership_id__cars_get",
+        "parameters": [
+          {
+            "name": "dealership_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Dealership Id"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/CarStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by car status",
+              "title": "Status"
+            },
+            "description": "Filter by car status"
+          },
+          {
+            "name": "is_sold",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by sold state",
+              "title": "Is Sold"
+            },
+            "description": "Filter by sold state"
+          },
+          {
+            "name": "make",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by make (partial match)",
+              "title": "Make"
+            },
+            "description": "Filter by make (partial match)"
+          },
+          {
+            "name": "color",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by color",
+              "title": "Color"
+            },
+            "description": "Filter by color"
+          },
+          {
+            "name": "min_price",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Minimum price",
+              "title": "Min Price"
+            },
+            "description": "Minimum price"
+          },
+          {
+            "name": "max_price",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Maximum price",
+              "title": "Max Price"
+            },
+            "description": "Maximum price"
+          },
+          {
+            "name": "min_year",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1900
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Minimum model year",
+              "title": "Min Year"
+            },
+            "description": "Minimum model year"
+          },
+          {
+            "name": "max_year",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "maximum": 2030
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Maximum model year",
+              "title": "Max Year"
+            },
+            "description": "Maximum model year"
+          },
+          {
+            "name": "max_mileage",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Maximum mileage",
+              "title": "Max Mileage"
+            },
+            "description": "Maximum mileage"
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/CarSortField",
+              "description": "Field to sort by",
+              "default": "created_at"
+            },
+            "description": "Field to sort by"
+          },
+          {
+            "name": "sort_order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/SortOrder",
+              "description": "Sort direction",
+              "default": "desc"
+            },
+            "description": "Sort direction"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedResponse_CarResponse_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dealerships/{dealership_id}/cars/bulk": {
+      "post": {
+        "tags": [
+          "Cars"
+        ],
+        "summary": "Add multiple cars to a dealership at once",
+        "operationId": "bulk_add_cars_dealerships__dealership_id__cars_bulk_post",
+        "parameters": [
+          {
+            "name": "dealership_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Dealership Id"
+            }
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "API key for authentication",
+              "title": "X-Api-Key"
+            },
+            "description": "API key for authentication"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkCarCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkCarResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cars/{car_id}": {
+      "get": {
+        "tags": [
+          "Cars"
+        ],
+        "summary": "Get a car with its full service history",
+        "operationId": "get_car_cars__car_id__get",
+        "parameters": [
+          {
+            "name": "car_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Car Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CarWithServices"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Cars"
+        ],
+        "summary": "Update Car",
+        "operationId": "update_car_cars__car_id__patch",
+        "parameters": [
+          {
+            "name": "car_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Car Id"
+            }
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "API key for authentication",
+              "title": "X-Api-Key"
+            },
+            "description": "API key for authentication"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CarUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CarResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Cars"
+        ],
+        "summary": "Delete Car",
+        "operationId": "delete_car_cars__car_id__delete",
+        "parameters": [
+          {
+            "name": "car_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Car Id"
+            }
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "API key for authentication",
+              "title": "X-Api-Key"
+            },
+            "description": "API key for authentication"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cars/{car_id}/sell": {
+      "post": {
+        "tags": [
+          "Cars"
+        ],
+        "summary": "Mark a car as sold",
+        "operationId": "mark_car_sold_cars__car_id__sell_post",
+        "parameters": [
+          {
+            "name": "car_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Car Id"
+            }
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "API key for authentication",
+              "title": "X-Api-Key"
+            },
+            "description": "API key for authentication"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CarResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Car is already sold"
+          },
+          "409": {
+            "description": "Car is currently in service"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cars/{car_id}/reserve": {
+      "post": {
+        "tags": [
+          "Cars"
+        ],
+        "summary": "Reserve a car for a customer",
+        "operationId": "reserve_car_cars__car_id__reserve_post",
+        "parameters": [
+          {
+            "name": "car_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Car Id"
+            }
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "API key for authentication",
+              "title": "X-Api-Key"
+            },
+            "description": "API key for authentication"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CarResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Car is not available for reservation"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cars/{car_id}/unreserve": {
+      "post": {
+        "tags": [
+          "Cars"
+        ],
+        "summary": "Release a reservation on a car",
+        "operationId": "unreserve_car_cars__car_id__unreserve_post",
+        "parameters": [
+          {
+            "name": "car_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Car Id"
+            }
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "API key for authentication",
+              "title": "X-Api-Key"
+            },
+            "description": "API key for authentication"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CarResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Car is not currently reserved"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cars/{car_id}/transfer": {
+      "post": {
+        "tags": [
+          "Cars"
+        ],
+        "summary": "Transfer a car to a different dealership",
+        "operationId": "transfer_car_cars__car_id__transfer_post",
+        "parameters": [
+          {
+            "name": "car_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Car Id"
+            }
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "API key for authentication",
+              "title": "X-Api-Key"
+            },
+            "description": "API key for authentication"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransferCarRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CarResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Car cannot be transferred in current state"
+          },
+          "404": {
+            "description": "Car or target dealership not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cars/{car_id}/photo": {
+      "post": {
+        "tags": [
+          "Cars"
+        ],
+        "summary": "Upload a photo for a car",
+        "operationId": "upload_car_photo_cars__car_id__photo_post",
+        "parameters": [
+          {
+            "name": "car_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Car Id"
+            }
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "API key for authentication",
+              "title": "X-Api-Key"
+            },
+            "description": "API key for authentication"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_car_photo_cars__car_id__photo_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CarResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid file type"
+          }
+        }
+      }
+    },
+    "/cars/compare": {
+      "post": {
+        "tags": [
+          "Cars"
+        ],
+        "summary": "Compare multiple cars side by side",
+        "operationId": "compare_cars_cars_compare_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompareRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompareResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dealerships/{dealership_id}/cars/{car_id}/services": {
+      "post": {
+        "tags": [
+          "Service Records"
+        ],
+        "summary": "Create a service record for a car at a dealership",
+        "operationId": "create_service_record_dealerships__dealership_id__cars__car_id__services_post",
+        "parameters": [
+          {
+            "name": "dealership_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Dealership Id"
+            }
+          },
+          {
+            "name": "car_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Car Id"
+            }
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "API key for authentication",
+              "title": "X-Api-Key"
+            },
+            "description": "API key for authentication"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceRecordCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceRecordResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Car does not belong to this dealership"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Service Records"
+        ],
+        "summary": "List all service records for a car",
+        "operationId": "list_service_records_dealerships__dealership_id__cars__car_id__services_get",
+        "parameters": [
+          {
+            "name": "dealership_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Dealership Id"
+            }
+          },
+          {
+            "name": "car_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Car Id"
+            }
+          },
+          {
+            "name": "service_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ServiceType"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by service type",
+              "title": "Service Type"
+            },
+            "description": "Filter by service type"
+          },
+          {
+            "name": "is_completed",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by completion status",
+              "title": "Is Completed"
+            },
+            "description": "Filter by completion status"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ServiceRecordResponse"
+                  },
+                  "title": "Response List Service Records Dealerships  Dealership Id  Cars  Car Id  Services Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/services/{service_id}": {
+      "get": {
+        "tags": [
+          "Service Records"
+        ],
+        "summary": "Get a single service record by ID",
+        "operationId": "get_service_record_services__service_id__get",
+        "parameters": [
+          {
+            "name": "service_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Service Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceRecordResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Service Records"
+        ],
+        "summary": "Update Service Record",
+        "operationId": "update_service_record_services__service_id__patch",
+        "parameters": [
+          {
+            "name": "service_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Service Id"
+            }
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "API key for authentication",
+              "title": "X-Api-Key"
+            },
+            "description": "API key for authentication"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceRecordUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceRecordResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Service Records"
+        ],
+        "summary": "Delete Service Record",
+        "operationId": "delete_service_record_services__service_id__delete",
+        "parameters": [
+          {
+            "name": "service_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Service Id"
+            }
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "API key for authentication",
+              "title": "X-Api-Key"
+            },
+            "description": "API key for authentication"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/services/{service_id}/complete": {
+      "post": {
+        "tags": [
+          "Service Records"
+        ],
+        "summary": "Mark a service as completed and return the car to available status",
+        "operationId": "complete_service_services__service_id__complete_post",
+        "parameters": [
+          {
+            "name": "service_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Service Id"
+            }
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "API key for authentication",
+              "title": "X-Api-Key"
+            },
+            "description": "API key for authentication"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceRecordResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Service is already completed"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/search": {
+      "get": {
+        "tags": [
+          "Search"
+        ],
+        "summary": "Search across dealerships and cars",
+        "operationId": "global_search_search_get",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200,
+              "description": "Search query",
+              "title": "Q"
+            },
+            "description": "Search query"
+          },
+          {
+            "name": "result_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/SearchResultType"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Limit to a specific result type",
+              "title": "Result Type"
+            },
+            "description": "Limit to a specific result type"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Body_upload_car_photo_cars__car_id__photo_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File",
+            "description": "Image file (JPEG, PNG, or WebP)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_upload_car_photo_cars__car_id__photo_post"
+      },
+      "BulkCarCreate": {
+        "properties": {
+          "cars": {
+            "items": {
+              "$ref": "#/components/schemas/CarCreate"
+            },
+            "type": "array",
+            "maxItems": 50,
+            "minItems": 1,
+            "title": "Cars"
+          }
+        },
+        "type": "object",
+        "required": [
+          "cars"
+        ],
+        "title": "BulkCarCreate"
+      },
+      "BulkCarResponse": {
+        "properties": {
+          "created": {
+            "items": {
+              "$ref": "#/components/schemas/CarResponse"
+            },
+            "type": "array",
+            "title": "Created"
+          },
+          "failed": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Failed"
+          },
+          "total_created": {
+            "type": "integer",
+            "title": "Total Created"
+          },
+          "total_failed": {
+            "type": "integer",
+            "title": "Total Failed"
+          }
+        },
+        "type": "object",
+        "required": [
+          "created",
+          "failed",
+          "total_created",
+          "total_failed"
+        ],
+        "title": "BulkCarResponse"
+      },
+      "CarCreate": {
+        "properties": {
+          "make": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Make",
+            "examples": [
+              "BMW"
+            ]
+          },
+          "model": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Model",
+            "examples": [
+              "M3"
+            ]
+          },
+          "year": {
+            "type": "integer",
+            "maximum": 2030.0,
+            "minimum": 1900.0,
+            "title": "Year",
+            "examples": [
+              2024
+            ]
+          },
+          "price": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Price",
+            "examples": [
+              75000.0
+            ]
+          },
+          "color": {
+            "type": "string",
+            "maxLength": 50,
+            "title": "Color",
+            "examples": [
+              "Alpine White"
+            ]
+          },
+          "mileage": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Mileage",
+            "default": 0,
+            "examples": [
+              1200
+            ]
+          },
+          "vin": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 17,
+                "minLength": 17
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vin",
+            "examples": [
+              "WBA5A5C55FD123456"
+            ]
+          },
+          "status": {
+            "$ref": "#/components/schemas/CarStatus",
+            "default": "available"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          }
+        },
+        "type": "object",
+        "required": [
+          "make",
+          "model",
+          "year",
+          "price",
+          "color"
+        ],
+        "title": "CarCreate"
+      },
+      "CarResponse": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "dealership_id": {
+            "type": "integer",
+            "title": "Dealership Id"
+          },
+          "make": {
+            "type": "string",
+            "title": "Make"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "year": {
+            "type": "integer",
+            "title": "Year"
+          },
+          "price": {
+            "type": "number",
+            "title": "Price"
+          },
+          "color": {
+            "type": "string",
+            "title": "Color"
+          },
+          "mileage": {
+            "type": "integer",
+            "title": "Mileage"
+          },
+          "vin": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vin"
+          },
+          "status": {
+            "$ref": "#/components/schemas/CarStatus"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "photo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Photo Url"
+          },
+          "is_sold": {
+            "type": "boolean",
+            "title": "Is Sold"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "sold_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sold At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "dealership_id",
+          "make",
+          "model",
+          "year",
+          "price",
+          "color",
+          "mileage",
+          "vin",
+          "status",
+          "description",
+          "photo_url",
+          "is_sold",
+          "created_at",
+          "updated_at",
+          "sold_at"
+        ],
+        "title": "CarResponse"
+      },
+      "CarSortField": {
+        "type": "string",
+        "enum": [
+          "price",
+          "year",
+          "mileage",
+          "created_at",
+          "make"
+        ],
+        "title": "CarSortField"
+      },
+      "CarStatus": {
+        "type": "string",
+        "enum": [
+          "available",
+          "reserved",
+          "sold",
+          "in_service"
+        ],
+        "title": "CarStatus"
+      },
+      "CarUpdate": {
+        "properties": {
+          "make": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Make"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "year": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 2030.0,
+                "minimum": 1900.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year"
+          },
+          "price": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price"
+          },
+          "color": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 50
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Color"
+          },
+          "mileage": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mileage"
+          },
+          "vin": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 17,
+                "minLength": 17
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vin"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CarStatus"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          }
+        },
+        "type": "object",
+        "title": "CarUpdate"
+      },
+      "CarWithServices": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "dealership_id": {
+            "type": "integer",
+            "title": "Dealership Id"
+          },
+          "make": {
+            "type": "string",
+            "title": "Make"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "year": {
+            "type": "integer",
+            "title": "Year"
+          },
+          "price": {
+            "type": "number",
+            "title": "Price"
+          },
+          "color": {
+            "type": "string",
+            "title": "Color"
+          },
+          "mileage": {
+            "type": "integer",
+            "title": "Mileage"
+          },
+          "vin": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vin"
+          },
+          "status": {
+            "$ref": "#/components/schemas/CarStatus"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "photo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Photo Url"
+          },
+          "is_sold": {
+            "type": "boolean",
+            "title": "Is Sold"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "sold_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sold At"
+          },
+          "service_records": {
+            "items": {
+              "$ref": "#/components/schemas/ServiceRecordResponse"
+            },
+            "type": "array",
+            "title": "Service Records",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "dealership_id",
+          "make",
+          "model",
+          "year",
+          "price",
+          "color",
+          "mileage",
+          "vin",
+          "status",
+          "description",
+          "photo_url",
+          "is_sold",
+          "created_at",
+          "updated_at",
+          "sold_at"
+        ],
+        "title": "CarWithServices"
+      },
+      "CompareRequest": {
+        "properties": {
+          "car_ids": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "maxItems": 5,
+            "minItems": 2,
+            "title": "Car Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "car_ids"
+        ],
+        "title": "CompareRequest"
+      },
+      "CompareResponse": {
+        "properties": {
+          "cars": {
+            "items": {
+              "$ref": "#/components/schemas/CarResponse"
+            },
+            "type": "array",
+            "title": "Cars"
+          },
+          "price_range": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Price Range"
+          },
+          "mileage_range": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Mileage Range"
+          },
+          "year_range": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Year Range"
+          }
+        },
+        "type": "object",
+        "required": [
+          "cars",
+          "price_range",
+          "mileage_range",
+          "year_range"
+        ],
+        "title": "CompareResponse"
+      },
+      "DealershipCreate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Name",
+            "examples": [
+              "Miggan Motors"
+            ]
+          },
+          "address": {
+            "type": "string",
+            "maxLength": 500,
+            "title": "Address",
+            "examples": [
+              "123 Main St, Dublin"
+            ]
+          },
+          "phone": {
+            "type": "string",
+            "maxLength": 20,
+            "title": "Phone",
+            "examples": [
+              "01-555-1234"
+            ]
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email",
+            "examples": [
+              "info@migganmotors.ie"
+            ]
+          },
+          "website": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Website",
+            "examples": [
+              "https://migganmotors.ie"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "address",
+          "phone"
+        ],
+        "title": "DealershipCreate"
+      },
+      "DealershipResponse": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "address": {
+            "type": "string",
+            "title": "Address"
+          },
+          "phone": {
+            "type": "string",
+            "title": "Phone"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "website": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Website"
+          },
+          "rating": {
+            "type": "number",
+            "title": "Rating"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "address",
+          "phone",
+          "email",
+          "website",
+          "rating",
+          "is_active",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "DealershipResponse"
+      },
+      "DealershipStats": {
+        "properties": {
+          "dealership_id": {
+            "type": "integer",
+            "title": "Dealership Id"
+          },
+          "dealership_name": {
+            "type": "string",
+            "title": "Dealership Name"
+          },
+          "total_cars": {
+            "type": "integer",
+            "title": "Total Cars"
+          },
+          "available_cars": {
+            "type": "integer",
+            "title": "Available Cars"
+          },
+          "reserved_cars": {
+            "type": "integer",
+            "title": "Reserved Cars"
+          },
+          "sold_cars": {
+            "type": "integer",
+            "title": "Sold Cars"
+          },
+          "in_service_cars": {
+            "type": "integer",
+            "title": "In Service Cars"
+          },
+          "total_inventory_value": {
+            "type": "number",
+            "title": "Total Inventory Value"
+          },
+          "total_sales_revenue": {
+            "type": "number",
+            "title": "Total Sales Revenue"
+          },
+          "average_car_price": {
+            "type": "number",
+            "title": "Average Car Price"
+          },
+          "average_days_to_sell": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Average Days To Sell"
+          },
+          "most_common_make": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Most Common Make"
+          },
+          "service_records_count": {
+            "type": "integer",
+            "title": "Service Records Count"
+          },
+          "total_service_revenue": {
+            "type": "number",
+            "title": "Total Service Revenue"
+          }
+        },
+        "type": "object",
+        "required": [
+          "dealership_id",
+          "dealership_name",
+          "total_cars",
+          "available_cars",
+          "reserved_cars",
+          "sold_cars",
+          "in_service_cars",
+          "total_inventory_value",
+          "total_sales_revenue",
+          "average_car_price",
+          "average_days_to_sell",
+          "most_common_make",
+          "service_records_count",
+          "total_service_revenue"
+        ],
+        "title": "DealershipStats"
+      },
+      "DealershipUpdate": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "address": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 20
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "website": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Website"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 5.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating"
+          },
+          "is_active": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Active"
+          }
+        },
+        "type": "object",
+        "title": "DealershipUpdate"
+      },
+      "DealershipWithCars": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "address": {
+            "type": "string",
+            "title": "Address"
+          },
+          "phone": {
+            "type": "string",
+            "title": "Phone"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "website": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Website"
+          },
+          "rating": {
+            "type": "number",
+            "title": "Rating"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "cars": {
+            "items": {
+              "$ref": "#/components/schemas/CarResponse"
+            },
+            "type": "array",
+            "title": "Cars",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "address",
+          "phone",
+          "email",
+          "website",
+          "rating",
+          "is_active",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "DealershipWithCars"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HealthResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "db_connected": {
+            "type": "boolean",
+            "title": "Db Connected"
+          },
+          "total_dealerships": {
+            "type": "integer",
+            "title": "Total Dealerships"
+          },
+          "total_cars": {
+            "type": "integer",
+            "title": "Total Cars"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "version",
+          "db_connected",
+          "total_dealerships",
+          "total_cars"
+        ],
+        "title": "HealthResponse"
+      },
+      "PaginatedResponse_CarResponse_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CarResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset",
+          "has_more"
+        ],
+        "title": "PaginatedResponse[CarResponse]"
+      },
+      "PaginatedResponse_DealershipResponse_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DealershipResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset",
+          "has_more"
+        ],
+        "title": "PaginatedResponse[DealershipResponse]"
+      },
+      "SearchResponse": {
+        "properties": {
+          "query": {
+            "type": "string",
+            "title": "Query"
+          },
+          "total_results": {
+            "type": "integer",
+            "title": "Total Results"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/SearchResult"
+            },
+            "type": "array",
+            "title": "Results"
+          }
+        },
+        "type": "object",
+        "required": [
+          "query",
+          "total_results",
+          "results"
+        ],
+        "title": "SearchResponse"
+      },
+      "SearchResult": {
+        "properties": {
+          "result_type": {
+            "$ref": "#/components/schemas/SearchResultType"
+          },
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "detail": {
+            "type": "string",
+            "title": "Detail"
+          },
+          "score": {
+            "type": "number",
+            "title": "Score"
+          }
+        },
+        "type": "object",
+        "required": [
+          "result_type",
+          "id",
+          "name",
+          "detail",
+          "score"
+        ],
+        "title": "SearchResult"
+      },
+      "SearchResultType": {
+        "type": "string",
+        "enum": [
+          "dealership",
+          "car"
+        ],
+        "title": "SearchResultType"
+      },
+      "ServiceRecordCreate": {
+        "properties": {
+          "service_type": {
+            "$ref": "#/components/schemas/ServiceType"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Description",
+            "examples": [
+              "Routine oil change and filter replacement"
+            ]
+          },
+          "cost": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Cost",
+            "examples": [
+              89.99
+            ]
+          },
+          "mechanic_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mechanic Name",
+            "examples": [
+              "John Murphy"
+            ]
+          },
+          "mileage_at_service": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Mileage At Service",
+            "examples": [
+              15000
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "service_type",
+          "description",
+          "cost",
+          "mileage_at_service"
+        ],
+        "title": "ServiceRecordCreate"
+      },
+      "ServiceRecordResponse": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "car_id": {
+            "type": "integer",
+            "title": "Car Id"
+          },
+          "service_type": {
+            "$ref": "#/components/schemas/ServiceType"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "cost": {
+            "type": "number",
+            "title": "Cost"
+          },
+          "mechanic_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mechanic Name"
+          },
+          "mileage_at_service": {
+            "type": "integer",
+            "title": "Mileage At Service"
+          },
+          "service_date": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Service Date"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "is_completed": {
+            "type": "boolean",
+            "title": "Is Completed"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "car_id",
+          "service_type",
+          "description",
+          "cost",
+          "mechanic_name",
+          "mileage_at_service",
+          "service_date",
+          "completed_at",
+          "is_completed",
+          "created_at"
+        ],
+        "title": "ServiceRecordResponse"
+      },
+      "ServiceRecordUpdate": {
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "cost": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost"
+          },
+          "mechanic_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mechanic Name"
+          }
+        },
+        "type": "object",
+        "title": "ServiceRecordUpdate"
+      },
+      "ServiceType": {
+        "type": "string",
+        "enum": [
+          "oil_change",
+          "tire_rotation",
+          "brake_inspection",
+          "full_inspection",
+          "engine_repair",
+          "body_work",
+          "detailing",
+          "other"
+        ],
+        "title": "ServiceType"
+      },
+      "SortOrder": {
+        "type": "string",
+        "enum": [
+          "asc",
+          "desc"
+        ],
+        "title": "SortOrder"
+      },
+      "TransferCarRequest": {
+        "properties": {
+          "target_dealership_id": {
+            "type": "integer",
+            "title": "Target Dealership Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "target_dealership_id"
+        ],
+        "title": "TransferCarRequest"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

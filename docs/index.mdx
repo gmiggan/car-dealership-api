@@ -1,0 +1,53 @@
+---
+title: Car Dealership API
+description: A comprehensive REST API for managing car dealerships, vehicle inventory, and service records.
+---
+
+# Car Dealership API
+
+Build and manage car dealership operations with a full-featured REST API covering inventory management, sales workflows, service tracking, and cross-dealership operations.
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Get the API running locally in under a minute.
+  </Card>
+  <Card title="Authentication" icon="lock" href="/authentication">
+    Learn how API key authentication works.
+  </Card>
+  <Card title="API Reference" icon="code" href="/api-reference">
+    Explore all 28 endpoints with interactive examples.
+  </Card>
+  <Card title="Concepts" icon="book" href="/concepts/dealerships">
+    Understand the data model and workflows.
+  </Card>
+</CardGroup>
+
+## Overview
+
+The API is organized around three core resources:
+
+| Resource | Description |
+| --- | --- |
+| **Dealerships** | Physical locations that hold car inventory. Each dealership tracks its own stats. |
+| **Cars** | Vehicles belonging to a dealership. Cars move through a status workflow: available → reserved → sold. |
+| **Service Records** | Maintenance history for individual cars. Nested under both dealerships and cars. |
+
+## Key Features
+
+<AccordionGroup>
+  <Accordion title="Pagination & Sorting">
+    All list endpoints return paginated responses with `total`, `has_more`, `limit`, and `offset` metadata. Car listings support sorting by price, year, mileage, or creation date.
+  </Accordion>
+  <Accordion title="Bulk Operations">
+    Add up to 50 cars in a single request. The response includes both `created` and `failed` arrays with per-item error reporting.
+  </Accordion>
+  <Accordion title="Status Workflow">
+    Cars follow a state machine: `available` → `reserved` → `sold`, with an `in_service` state during maintenance. Guard clauses prevent invalid transitions.
+  </Accordion>
+  <Accordion title="Cross-Dealership Transfer">
+    Move cars between dealerships while preserving their full service history.
+  </Accordion>
+  <Accordion title="Global Search">
+    Search across dealerships and cars simultaneously with type filtering and relevance scoring.
+  </Accordion>
+</AccordionGroup>

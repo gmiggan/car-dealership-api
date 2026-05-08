@@ -1,0 +1,125 @@
+---
+title: Service Records
+description: Understanding service records — maintenance tracking with a completion workflow.
+---
+
+# Service Records
+
+A **ServiceRecord** tracks maintenance work performed on a car. It is the deepest nested resource in the API, accessible via a 3-level path: `/dealerships/{dealership_id}/cars/{car_id}/services`.
+
+## Data Model
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `id` | integer | Auto | Unique identifier |
+| `car_id` | integer | Auto | ID of the car being serviced |
+| `service_type` | enum | Yes | Category of service performed |
+| `description` | string | Yes | Details of the work (max 2000 chars) |
+| `cost` | float | Yes | Cost of the service (≥ 0) |
+| `mechanic_name` | string | No | Name of the mechanic |
+| `mileage_at_service` | integer | Yes | Odometer reading at time of service |
+| `service_date` | datetime | Auto | When the service was logged |
+| `completed_at` | datetime | Auto | When the service was marked complete |
+| `is_completed` | boolean | Auto | Whether the service is finished (default: false) |
+| `created_at` | datetime | Auto | Record creation timestamp |
+
+## Service Types
+
+The `service_type` field accepts these values:
+
+| Value | Description |
+| --- | --- |
+| `oil_change` | Oil and filter replacement |
+| `tire_rotation` | Tire rotation and balancing |
+| `brake_inspection` | Brake pad and rotor check |
+| `full_inspection` | Comprehensive vehicle inspection |
+| `engine_repair` | Engine mechanical work |
+| `body_work` | Body panel repair or paint |
+| `detailing` | Interior/exterior detailing |
+| `other` | Anything not covered above |
+
+## Completion Workflow
+
+Service records follow a simple open → completed lifecycle:
+
+```
+    POST /dealerships/{id}/cars/{id}/services
+                    │
+                    ▼
+            ┌──────────────┐
+            │     open     │  (is_completed: false)
+            │              │  Car status → in_service
+            └──────┬───────┘
+                   │
+         POST /services/{id}/complete
+                   │
+                   ▼
+            ┌──────────────┐
+            │  completed   │  (is_completed: true, completed_at set)
+            │              │  Car status → available (if last open service)
+            └──────────────┘
+```
+
+### Car Status Integration
+
+Creating a service record automatically sets the car's status to `in_service`. This prevents the car from being sold or reserved while under maintenance.
+
+When a service is completed, the system checks if any other open service records exist for that car. If the completed service was the **last open one**, the car's status is returned to `available`. If other services are still open, the car stays `in_service`.
+
+This means a car can have multiple concurrent open services — it only becomes available again when all of them are completed.
+
+## Dealership Validation
+
+Service records are created via the nested path `POST /dealerships/{dealership_id}/cars/{car_id}/services`. The API validates that the car actually belongs to the specified dealership. If the car exists but is at a different dealership, the request returns a `400` error:
+
+```json
+{
+  "detail": "Car does not belong to this dealership"
+}
+```
+
+This prevents accidentally logging service work at the wrong location.
+
+## Filtering
+
+The list endpoint supports filtering by:
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `service_type` | enum | Filter by type of service |
+| `is_completed` | boolean | Filter by completion status |
+
+Results are sorted by `service_date` in descending order (most recent first).
+
+## Example: Full Service Lifecycle
+
+<Steps>
+  <Step title="Create a service record">
+    ```bash
+    curl -X POST http://localhost:8111/dealerships/1/cars/2/services \
+      -H "Content-Type: application/json" \
+      -H "x-api-key: demo-key-12345" \
+      -d '{
+        "service_type": "oil_change",
+        "description": "Routine oil change and filter replacement",
+        "cost": 89.99,
+        "mechanic_name": "John Murphy",
+        "mileage_at_service": 15000
+      }'
+    ```
+    The car's status is now `in_service`.
+  </Step>
+  <Step title="Check the car's status">
+    ```bash
+    curl http://localhost:8111/cars/2
+    ```
+    The response shows `"status": "in_service"` and the service record in the `service_records` array.
+  </Step>
+  <Step title="Complete the service">
+    ```bash
+    curl -X POST http://localhost:8111/services/1/complete \
+      -H "x-api-key: demo-key-12345"
+    ```
+    The service record now has `is_completed: true` and a `completed_at` timestamp. The car returns to `available`.
+  </Step>
+</Steps>

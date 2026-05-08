@@ -1,0 +1,45 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "name": "Car Dealership API",
+  "theme": "mint",
+  "colors": {
+    "primary": "#1a56db",
+    "light": "#3b82f6",
+    "dark": "#1e3a5f"
+  },
+  "favicon": "/favicon.svg",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": ["index", "quickstart", "authentication"]
+          },
+          {
+            "group": "Concepts",
+            "pages": ["concepts/dealerships", "concepts/cars", "concepts/services"]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "openapi": "openapi.json"
+      }
+    ]
+  },
+  "api": {
+    "baseUrl": "http://localhost:8111",
+    "auth": {
+      "method": "key",
+      "name": "x-api-key"
+    },
+    "playground": {
+      "mode": "simple"
+    }
+  },
+  "feedback": {
+    "thumbsRating": true
+  }
+}
